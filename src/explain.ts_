@@ -4,19 +4,19 @@ import AST from "../ast";
 import Decorator from "../highlight/decorator";
 import Highlight from "../highlight/highlight";
 import {
-  ArgumentNodeAST,
-  AssignmentNodeAST,
+  ArgumentNode,
+  AssignmentNode,
   ConsoleAnswers,
-  ExplainCommandResponse,
-  OperatorNodeAST,
-  OptionNodeAST,
-  PipeNodeAST,
-  ProgramNodeAST,
-  RedirectNodeAST,
-  StickyOptionNodeAST,
-  SubcommandNodeAST,
-  SudoNodeAST,
-  WordNodeAST,
+  ExplainResponse,
+  OperatorNode,
+  OptionNode,
+  PipeNode,
+  ProgramNode,
+  RedirectNode,
+  StickyOptionNode,
+  SubcommandNode,
+  SudoNode,
+  WordNode,
 } from "../interfaces";
 import Console from "./console";
 
@@ -49,7 +49,6 @@ class ExplainConsole extends Console {
     {
       message: "Awesome! What did you like about this explanation?",
       name: "comment",
-      prefix: `${fireEmoji}`,
       type: "input",
     },
   ];
@@ -58,7 +57,6 @@ class ExplainConsole extends Console {
     {
       message: "What's wrong with the explanation?",
       name: "comment",
-      prefix: `${thumbsDownEmoji}`,
       type: "input",
     },
   ];
@@ -70,14 +68,14 @@ class ExplainConsole extends Console {
   public makeHelp(
     leafNodes: Array<
       Array<
-        | OptionNodeAST
-        | ProgramNodeAST
-        | AssignmentNodeAST
-        | SubcommandNodeAST
-        | OperatorNodeAST
-        | PipeNodeAST
-        | StickyOptionNodeAST
-        | RedirectNodeAST
+        | OptionNode
+        | ProgramNode
+        | AssignmentNode
+        | SubcommandNode
+        | OperatorNode
+        | PipeNode
+        | StickyOptionNode
+        | RedirectNode
       >
     >,
   ): string {
@@ -86,7 +84,7 @@ class ExplainConsole extends Console {
     for (const unit of leafNodes) {
       for (const node of unit) {
         if (AST.isProgram(node)) {
-          const programNode = node as ProgramNodeAST;
+          const programNode = node as ProgramNode;
           const { summary, name } = programNode.schema;
           const decoratedProgramName = Decorator.decorate(name, programNode);
 
@@ -94,7 +92,7 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isOption(node)) {
-          const optionNode = node as OptionNodeAST;
+          const optionNode = node as OptionNode;
           const { summary, long, short } = optionNode.optionSchema;
           const decoratedOptions = [];
 
@@ -110,7 +108,7 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isSubcommand(node)) {
-          const subcommandNode = node as SubcommandNodeAST;
+          const subcommandNode = node as SubcommandNode;
           const { name, summary } = subcommandNode.schema;
           const decoratedSubcommandName = Decorator.decorate(name, subcommandNode);
 
@@ -118,7 +116,7 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isAssignment(node)) {
-          const assignmentNode = node as AssignmentNodeAST;
+          const assignmentNode = node as AssignmentNode;
           const { word } = assignmentNode;
           const decoratedAssignment = Decorator.decorate(word, assignmentNode);
 
@@ -126,7 +124,7 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isOperator(node)) {
-          const operatorNode = node as OperatorNodeAST;
+          const operatorNode = node as OperatorNode;
           const { op } = operatorNode;
           const decoratedOperator = Decorator.decorate(op, operatorNode);
 
@@ -140,21 +138,21 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isSudo(node)) {
-          const sudoNode = node as SudoNodeAST;
+          const sudoNode = node as SudoNode;
           const { summary } = sudoNode.schema;
           const decoratedNode = Decorator.decorate("sudo", sudoNode);
           help += `  ${decoratedNode}\n    ${summary}`;
         }
 
         if (AST.isArgument(node)) {
-          const argNode = node as ArgumentNodeAST;
+          const argNode = node as ArgumentNode;
           const { word } = argNode;
           const decoratedNode = Decorator.decorate(word, argNode);
           help += `  ${decoratedNode}\n    An argument`;
         }
 
         if (AST.isPipe(node)) {
-          const pipeNode = node as PipeNodeAST;
+          const pipeNode = node as PipeNode;
           const { pipe } = pipeNode;
           const decoratedNode = Decorator.decorate(pipe, pipeNode);
           help += `  ${decoratedNode}\n`;
@@ -162,7 +160,7 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isRedirect(node)) {
-          const redirectNode = node as RedirectNodeAST;
+          const redirectNode = node as RedirectNode;
           const { type, output, input, output_fd } = redirectNode;
           const decoratedRedirectNode = Decorator.decorate(type, redirectNode);
           let wordNode: any;
@@ -202,7 +200,7 @@ class ExplainConsole extends Console {
         }
 
         if (AST.isWord(node)) {
-          const wordNode = node as WordNodeAST;
+          const wordNode = node as WordNode;
           const decoratedNode = Decorator.decorate(wordNode.word, wordNode);
           help += `  ${decoratedNode}\n    An argument`;
         }
@@ -236,10 +234,20 @@ class ExplainConsole extends Console {
     super.error(msg);
   }
 
-  public render(data: ExplainCommandResponse) {
-    const { query, leafNodes } = data.explainCommand;
+  public render(data: ExplainResponse) {
+    const { query, ast } = data.explain;
+    let explanation = {};
+
+    try {
+      explanation = JSON.parse(ast);
+      console.log(explanation);
+    } catch (err) {
+      console.error(err);
+    }
+
     this.print();
 
+    /*
     if (leafNodes.length === 0) {
       this.error(
         "Your query didn't match any program in our database. Please try with another program",
@@ -251,6 +259,7 @@ class ExplainConsole extends Console {
 
       this.print(help);
     }
+    */
   }
 }
 

@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
-const inquirer_1 = __importDefault(require("inquirer"));
+const enquirer_1 = __importDefault(require("enquirer"));
 const ora_1 = __importDefault(require("ora"));
 class Console {
     async prompt(questions) {
-        return inquirer_1.default.prompt(questions);
+        return enquirer_1.default.prompt(questions);
     }
     print(content) {
         console.log(content ? content : "");

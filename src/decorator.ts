@@ -1,24 +1,23 @@
 import chalk from "chalk";
 import {
-  RootNodeAST,
-  OptionNodeAST,
-  ArgumentNodeAST,
-  ProgramNodeAST,
-  OperatorNodeAST,
+  OptionNode,
+  ArgumentNode,
+  ProgramNode,
+  OperatorNode,
   Theme,
   ExplainCommand,
-  OptionWithArgNodeAST,
+  OptionWithArgNode,
   OptionSchema,
   ProgramSchema,
-  AssignmentNodeAST,
-  PipeNodeAST,
-  StickyOptionNodeAST,
-  SudoNodeAST,
-  ReservedWordNodeAST,
-  RedirectNodeAST,
-  WordNodeAST,
-} from "../interfaces";
-import AST from "../ast";
+  AssignmentNode,
+  PipeNode,
+  StickyOptionNode,
+  SudoNode,
+  ReservedWordNode,
+  RedirectNode,
+  WordNode,
+} from "./interfaces";
+import AST from "./ast";
 
 const HIGHLIGHT_DEFAULTS: any = {
   argument: chalk.italic.bold.whiteBright,
@@ -42,28 +41,28 @@ class Decorator {
   static decorate(
     word: string,
     token:
-      | OptionNodeAST
-      | ProgramNodeAST
-      | OptionWithArgNodeAST
-      | ArgumentNodeAST
-      | OperatorNodeAST
-      | AssignmentNodeAST
-      | PipeNodeAST
-      | SudoNodeAST
-      | ReservedWordNodeAST
-      | RedirectNodeAST
-      | WordNodeAST,
+      | OptionNode
+      | ProgramNode
+      | OptionWithArgNode
+      | ArgumentNode
+      | OperatorNode
+      | AssignmentNode
+      | PipeNode
+      | SudoNode
+      | ReservedWordNode
+      | RedirectNode
+      | WordNode,
   ): string {
     let decoratedString: string = "";
 
     if (AST.isAssignment(token)) {
-      const assignmentToken = token as AssignmentNodeAST;
+      const assignmentToken = token as AssignmentNode;
 
       decoratedString = Decorator.color("assignmentName", assignmentToken.name);
       decoratedString += "=";
       decoratedString += Decorator.color("assignmentValue", assignmentToken.value || "");
     } else if (AST.isRedirect(token)) {
-      const redirectToken = token as RedirectNodeAST;
+      const redirectToken = token as RedirectNode;
       const { input, output, output_fd, type } = redirectToken;
 
       if (input !== null) {

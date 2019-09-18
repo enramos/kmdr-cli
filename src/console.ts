@@ -1,13 +1,13 @@
 import chalk from "chalk";
-import inquirer from "inquirer";
+import enquirer from "enquirer";
 import Spinner from "ora";
-import { ConsoleAnswers } from "../interfaces";
+import { ConsoleAnswers } from "./interfaces";
 
-class Console {
+export default class Console {
   private spinner?: any;
 
-  public async prompt(questions: object[]): Promise<ConsoleAnswers> {
-    return inquirer.prompt(questions);
+  public async prompt(questions: any): Promise<any> {
+    return enquirer.prompt(questions);
   }
 
   public print(content?: string) {
@@ -38,5 +38,3 @@ class Console {
     this.spinner.succeed(text);
   }
 }
-
-export default Console;

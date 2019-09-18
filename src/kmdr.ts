@@ -1,34 +1,33 @@
 import cli from "commander";
-import ExplainClient from "./client/explain";
-import ExplainConsole from "./console/explain";
 import { Settings } from "./interfaces";
-
-// tslint:disable-next-line: no-var-requires
-const pkg = require("../package.json");
+import { Explain } from "./explain";
+import { KMDR_CLI_VERSION } from "./constants";
 
 class KMDR {
   private settings: Settings | undefined;
   private cli = cli;
-  private version: string = "";
-  private explainClient: ExplainClient;
-  private explainConsole: ExplainConsole;
   // tslint:disable-next-line: max-line-length
   private welcomeMsg = `The CLI client for explaining complex shell commands.\n\nkmdr provides command explanations for hundreds of programs including git, docker, kubectl,npm, go and more straight forward programs such as those built into bash.`;
 
   constructor(settings?: Settings) {
     this.settings = settings;
-    this.version = pkg.version;
-    this.explainClient = new ExplainClient(this.version);
-    this.explainConsole = new ExplainConsole();
   }
 
   public async init() {
-    this.cli.description(this.welcomeMsg).version(this.version, "-v, --version");
+    this.cli.description(this.welcomeMsg).version(KMDR_CLI_VERSION, "-v, --version");
     this.cli
       .command("explain")
       .alias("e")
       .description("Explain a shell command")
-      .action(this.promptExplain.bind(this));
+      .option("-h, --highlight", "Show syntax highlighting")
+      .option("-i, --interactive", "Open kmdr in Interactive mode")
+      .action(this.explain);
+
+    this.cli
+      .command("config")
+      .alias("c")
+      .description("Configure kmdr-cli on this machine")
+      .action(this.config);
 
     this.cli.parse(process.argv);
 
@@ -37,6 +36,18 @@ class KMDR {
     }
   }
 
+  private async explain(command: any) {
+    const { interactive, highlight } = command;
+
+    const explain = new Explain();
+
+    await explain.render({ interactive, highlight });
+  }
+
+  private async config(a: any, b: any) {
+    console.log("config");
+  }
+  /*
   private async promptExplain(args?: any) {
     const { query } = await this.explainConsole.prompt();
 
@@ -77,6 +88,7 @@ class KMDR {
   private promptConfig() {
     console.log("promptConfig");
   }
+  */
 }
 
 export default KMDR;
